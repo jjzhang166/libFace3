@@ -1,0 +1,10 @@
+%YAML:1.0
+featDataPath: "/data/FeatureDB/"
+imagesPath: "/data/FaceImages/"
+serviceNumber: 2
+serviceHost: "192.168.99.101:8089"
+service1: "192.168.99.102:8089"
+
+faceNetReceiveNumber: 30
+faceResourceNumber: 15
+faceResourceNumberMax: 25
