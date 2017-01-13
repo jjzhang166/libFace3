@@ -1,16 +1,20 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
+*.creator*
+*.files
+*.includes
+*.config*
+*.pro.user
+
 *~
 *.autosave
-*.a
 *.core
 *.moc
 *.o
 *.obj
 *.orig
 *.rej
-*.so
 *.so.*
 *_pch.h.cpp
 *_resource.rc
