@@ -52,7 +52,7 @@ all: $(target)
 	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS) $(CXXFLAGS) $(INCLUDE)
 
 $(target): $(objs)
-	$(CC) -o $@ $^ $(LOCAL_SHARE_LIB) $(LOCAL_C_LIBRARIES)
+	$(CC) -o $@ $^ $(LOCAL_SHARE_LIB) $(LOCAL_C_LIBRARIES) -Wl,--rpath=$(LOCAL_PATH)/HCNet/lib:$(LOCAL_PATH)/HCNet/HCNetSDKCom
 
 clean:
 	$(RM) $(SRC)/*.o
