@@ -9,7 +9,11 @@ LOCAL_C_LIBRARIES := -L ${LOCAL_PATH}/lib \
 					-L ${LOCAL_PATH}/HCNet/HCNetSDKCom
 
 
-LOCAL_SHARE_LIB := -pthread
+LOCAL_SHARE_LIB := -lboost_system -lcurl -lb64 \
+					-lopencv_core -lopencv_highgui -lopencv_imgproc \
+					-lopencv_flann -lopencv_objdetect -lopencv_video\
+					-lhcnetsdk -lPlayCtrl -lAudioRender -lSuperRender \
+					-pthread
 
 CPPFLAGS := 
 CFLAGS :=
