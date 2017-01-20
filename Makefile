@@ -6,7 +6,7 @@ LOCAL_PATH:= $(shell pwd)
 
 LOCAL_C_LIBRARIES := -L ${LOCAL_PATH}/lib \
 					-L ${LOCAL_PATH}/HCNet/lib \
-					-L ${LOCAL_PATH}/HCNet/HCNetSDKCom
+					-L ${LOCAL_PATH}
 
 
 LOCAL_SHARE_LIB := -lboost_system -lcurl -lb64 \
@@ -15,12 +15,14 @@ LOCAL_SHARE_LIB := -lboost_system -lcurl -lb64 \
 					-lhcnetsdk -lPlayCtrl -lAudioRender -lSuperRender \
 					-pthread
 
+INCLUDE := -I ${LOCAL_PATH}/include \
+			-I ${LOCAL_PATH}/HCNet/ \
+			-I /usr/local/include/opencv
+
 CPPFLAGS := 
 CFLAGS :=
 CXXFLAGS := -std=c++11 -g
 
-INCLUDE := -I ${LOCAL_PATH}/include \
-			-I ${LOCAL_PATH}/HCNet/
 
 SRC := ${LOCAL_PATH}/src
 EXAM := ${LOCAL_PATH}/example

@@ -1,8 +1,10 @@
-#ifndef QY_HCNETWRAPPER_HPP
-#define QY_HCNETWRAPPER_HPP
+#ifndef HCNetWrapper_HPP
+#define HCNetWrapper_HPP
 
 #include "HCNetSDK.h"
 #include "LinuxPlayM4.h"
+
+#include <string>
 
 class HCNetWrapper{
     typedef struct{
@@ -94,4 +96,4 @@ private:
 };
 
 
-#endif // QY_HCNETWRAPPER_HPP
+#endif // HCNetWrapper_HPP

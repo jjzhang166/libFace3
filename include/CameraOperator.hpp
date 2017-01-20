@@ -1,8 +1,8 @@
-#ifndef QY_CAMERAOPERATOR_H
-#define QY_CAMERAOPERATOR_H
+#ifndef CameraOperator_H
+#define CameraOperator_H
 
-#include "QY_Log.hpp"
-#include "QY_HCNetWrapper.hpp"
+#include "Log.hpp"
+#include "HCNetWrapper.hpp"
 
 #include <opencv2/opencv.hpp>
 
@@ -14,7 +14,7 @@
 #include <sys/unistd.h>
 
 
-class QY_CameraOperator{
+class CameraOperator{
 public:
     /* type define */
     typedef std::function<void(cv::Mat)> Handler;
@@ -28,7 +28,7 @@ public:
 
 /* below is static function define */
 
-void QY_CameraOperator::handleFrameFromRtspCamera(std::string rtspAddress, Handler handler){
+void CameraOperator::handleFrameFromRtspCamera(std::string rtspAddress, Handler handler){
 //    string rtspAddress = "rtsp://admin:qy38888813@192.168.1.64:554/che/main/av_stream";
     using namespace cv;
     using namespace std;
@@ -57,7 +57,7 @@ void QY_CameraOperator::handleFrameFromRtspCamera(std::string rtspAddress, Handl
 }
 
 
-void QY_CameraOperator::handleFrameFromUSBCamera(Handler handler){
+void CameraOperator::handleFrameFromUSBCamera(Handler handler){
     using namespace cv;
     using namespace std;
 
@@ -83,7 +83,7 @@ void QY_CameraOperator::handleFrameFromUSBCamera(Handler handler){
     }
 }
 
-void QY_CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handler){
+void CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handler){
     using namespace cv;
     using namespace std;
     try
@@ -119,7 +119,7 @@ void QY_CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler han
     }
 }
 
-void QY_CameraOperator::handleFrameFromImage(std::string imagePath, Handler handler){
+void CameraOperator::handleFrameFromImage(std::string imagePath, Handler handler){
     using namespace cv;
     using namespace std;
     Mat image = imread(imagePath);
@@ -137,4 +137,4 @@ void QY_CameraOperator::handleFrameFromImage(std::string imagePath, Handler hand
 
 
 
-#endif // QY_CAMERAOPERATOR_H
+#endif // CameraOperator_H

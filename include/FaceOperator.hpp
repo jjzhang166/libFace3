@@ -1,7 +1,7 @@
-#ifndef QY_FACEOPERATOR_H
-#define QY_FACEOPERATOR_H
+#ifndef FaceOperator_H
+#define FaceOperator_H
 
-#include "QY_Log.hpp"
+#include "Log.hpp"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -12,7 +12,7 @@
 #include <vector>
 
 
-class QY_FaceOperator{
+class FaceOperator{
 public:
     typedef std::function<void(cv::Mat)> DetectResHandle;
 
@@ -28,23 +28,22 @@ private:
 };
 
 /* below is static variable define */
-std::mutex QY_FaceOperator::m_ClassierMutex;
-cv::CascadeClassifier QY_FaceOperator::m_CascadeClassier;
+std::mutex FaceOperator::m_ClassierMutex;
+cv::CascadeClassifier FaceOperator::m_CascadeClassier;
 
 /* below is static function define */
 
-bool QY_FaceOperator::loadCascadeClassifier(const std::string &fliePath){
+bool FaceOperator::loadCascadeClassifier(const std::string &fliePath){
     return m_CascadeClassier.load(fliePath);
 }
 
-void QY_FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip,
-                                 DetectResHandle resultHandle){
+void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip,
+                              DetectResHandle resultHandle){
     using namespace cv;
     using namespace std;
-    try
-    {
+    try {
         if(img.empty()){
-            LOG_INFO ("img is empty\n");
+            LOG_INFO("img is empty\n");
             return;
         }
 
@@ -54,13 +53,13 @@ void QY_FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip,
         faces2.clear();
 
         const static Scalar colors[] = { CV_RGB(0, 0, 255),
-            CV_RGB(0, 128, 255),
-            CV_RGB(0, 255, 255),
-            CV_RGB(0, 255, 0),
-            CV_RGB(255, 128, 0),
-            CV_RGB(255, 255, 0),
-            CV_RGB(255, 0, 0),
-            CV_RGB(255, 0, 255) };
+                                         CV_RGB(0, 128, 255),
+                                         CV_RGB(0, 255, 255),
+                                         CV_RGB(0, 255, 0),
+                                         CV_RGB(255, 128, 0),
+                                         CV_RGB(255, 255, 0),
+                                         CV_RGB(255, 0, 0),
+                                         CV_RGB(255, 0, 255) };
 
         Mat gray, smallImg(cvRound(img.rows / scale), cvRound(img.cols / scale), CV_8UC1);
         cvtColor(img, gray, CV_BGR2GRAY);
@@ -82,9 +81,7 @@ void QY_FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip,
         {
             flip(smallImg, smallImg, 1);
             m_CascadeClassier.detectMultiScale(smallImg, faces2,
-                                               1.1, 2, 0
-                                               | CV_HAAR_SCALE_IMAGE
-                                               ,
+                                               1.1, 2, 0 | CV_HAAR_SCALE_IMAGE,
                                                Size(30, 30));
             cout << "faces2.size():" << faces2.size() << endl;
             for (vector<Rect>::const_iterator r = faces2.begin(); r != faces2.end(); r++)
@@ -95,7 +92,7 @@ void QY_FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip,
         m_ClassierMutex.unlock();
 
         if (faces.size() > 0){
-            LOG_INFO ("faces size: %d.................\n", faces.size());
+            LOG_INFO("~~~~~~~~~~~~~~faces count: %d~~~~~~~~~~~~~~\n", faces.size());
             for (vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++, i++)
             {
                 Mat procImage(smallImg, Rect((r->x)*scale, r->y*scale, r->width*scale, r->height*scale));
@@ -104,22 +101,21 @@ void QY_FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip,
                     resultHandle(procImage);
                 }
                 else{
-                    LOG_INFO ("face detect not result handler....\n");
+                    LOG_INFO("face detect not result handler\n");
                     continue;
                 }
             }
 
         }
         else{
-            cout << "This image is not a face, ignore it" << endl;
+            LOG_INFO("This image is not a face, ignore it\n");
         }
 
     }
-    catch (std::exception& e)
-    {
-        std::cout << "\nexception thrown!" << std::endl;
-        std::cout << e.what() << std::endl;
+    catch (std::exception& e){
+        LOG_INFO("exception thrown->[%s]\n", e.what());
     }
 }
 
-#endif // QY_FACEOPERATOR_H
+
+#endif // FaceOperator_H
