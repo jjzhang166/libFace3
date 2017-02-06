@@ -14,7 +14,7 @@
 #include <sys/unistd.h>
 
 
-class CameraOperator{
+class CameraOperator {
 public:
     /* type define */
     typedef std::function<void(cv::Mat)> Handler;
@@ -28,7 +28,7 @@ public:
 
 /* below is static function define */
 
-void CameraOperator::handleFrameFromRtspCamera(std::string rtspAddress, Handler handler){
+void CameraOperator::handleFrameFromRtspCamera(std::string rtspAddress, Handler handler) {
 //    string rtspAddress = "rtsp://admin:qy38888813@192.168.1.64:554/che/main/av_stream";
     using namespace cv;
     using namespace std;
@@ -43,21 +43,21 @@ void CameraOperator::handleFrameFromRtspCamera(std::string rtspAddress, Handler 
         return;
     }
 
-    while (true){
+    while (true) {
         if (!vcap.read(image)) {
             cout << "No frame" << endl;
             continue;
         }
         waitKey(1);
         Mat faceImage = image.clone();
-        if(handler != NULL){
+        if(handler != NULL) {
             handler(faceImage);
         }
     }
 }
 
 
-void CameraOperator::handleFrameFromUSBCamera(Handler handler){
+void CameraOperator::handleFrameFromUSBCamera(Handler handler) {
     using namespace cv;
     using namespace std;
 
@@ -71,25 +71,24 @@ void CameraOperator::handleFrameFromUSBCamera(Handler handler){
         return;
     }
 
-    while (true){
+    while (true) {
         if (!vcap.read(image)) {
             cout << "No frame" << endl;
             continue;
         }
         Mat faceImage = image.clone();
-        if(handler != NULL){
+        if(handler != NULL) {
             handler(faceImage);
         }
     }
 }
 
-void CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handler){
+void CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handler) {
     using namespace cv;
     using namespace std;
-    try
-    {
+    try  {
         LONG lUserID = hcNet.loginV30();
-        if (lUserID < 0){
+        if (lUserID < 0) {
             cout << "Login Error---" << hcNet.getLastError() << endl;
             return;
         }
@@ -100,7 +99,7 @@ void CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handle
         lRealPlayHandle = hcNet.realPlayV40();
 
         cout << "lRealPlayHandle:" << lRealPlayHandle << endl;
-        if(lRealPlayHandle < 0){
+        if(lRealPlayHandle < 0) {
             cout << "NET_DVR_RealPlay_V40 error---" << hcNet.getLastError() << endl;
             hcNet.loginOut();
         }
@@ -111,23 +110,22 @@ void CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handle
         hcNet.loginOut();
         return;
     }
-    catch (exception& e)
-    {
+    catch (exception& e) {
         cout << "\nexception thrown!" << endl;
         cout << e.what() << endl;
         throw;
     }
 }
 
-void CameraOperator::handleFrameFromImage(std::string imagePath, Handler handler){
+void CameraOperator::handleFrameFromImage(std::string imagePath, Handler handler) {
     using namespace cv;
     using namespace std;
     Mat image = imread(imagePath);
-    if(!image.data){
+    if(!image.data) {
         cout << "No data!--Exiting the program" << endl;
         return;
     }
-    if(handler != NULL){
+    if(handler != NULL) {
         handler(image);
     }
 //    waitKey(5000);
