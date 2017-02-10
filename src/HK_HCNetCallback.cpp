@@ -1,8 +1,6 @@
 #include "HCNetWrapper.hpp"
 
-
 #include <opencv/cv.hpp>
-
 
 #include <iostream>
 #include <thread>
@@ -29,15 +27,13 @@ void CALLBACK DecCBFun(int nPort, char* pBuf, int nSize, FRAME_INFO* pFrameInfo,
             std::thread t([](cv::Mat img, double scale, bool tryflip){}, pImg, 1.0, false);
             t.detach();
         }
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         std::cout << "\nexception thrown!" << std::endl;
         std::cout << e.what() << std::endl;
     }
 }
 
 void CALLBACK fRealDataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, void *pUser) {
-
     int nPort = -1;
     try{
         switch (dwDataType) {
@@ -83,8 +79,7 @@ void CALLBACK fRealDataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffe
             }
             break;
         }
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         std::cout << "\nexception thrown!" << std::endl;
         std::cout << e.what() << std::endl;
     }

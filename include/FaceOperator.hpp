@@ -18,11 +18,11 @@ class FaceOperator {
 public:
     typedef std::function<void(cv::Mat)> DetectResHandle;
 
+public:
     static bool loadCascadeClassifier(const std::string& fliePath);
-    static void faceDetect(cv::Mat img, double scale, bool tryflip,
-                           DetectResHandle resultHandle);
+    static void faceDetect(cv::Mat img, double scale, bool tryflip, DetectResHandle resultHandle);
     static int extractFeature(const std::string& imagePath, std::vector<float>& feature);
-    static void faceRecognition();
+    static void faceRecognition(cv::Mat feature, std::vector<cv::Mat> featureSet, int num = 1);
 
 private:
     inline double randf() {
@@ -35,8 +35,8 @@ private:
     void knn_search(const cv::Mat& data, const cv::Mat& point,
                     std::vector<int>& indices, std::vector<float>& dists, const int k, int distFlag);
 
-    static int dlib_img_2_mat(dlib::array2d<dlib::rgb_pixel>&in, cv::Mat &out);
-    static int get_normalization_face2(const char inputFileName[], cv::Mat& face, int targetWidth);
+    static int dlib_img_2_mat(dlib::array2d<dlib::rgb_pixel>& in, cv::Mat &out);
+    static int get_normalization_face2(const char* inputFileName, cv::Mat& face, int targetWidth);
 
 private:
     static std::mutex m_ClassierMutex;
@@ -100,7 +100,6 @@ void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip, DetectRes
             cout << "CascadeClassie is working" << endl;
             return;
         }
-
         m_CascadeClassier.detectMultiScale(smallImg, faces,
                                            1.1, 2, 0
                                            //|CV_HAAR_FIND_BIGGEST_OBJECT
@@ -126,15 +125,13 @@ void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip, DetectRes
                 // handle detect result
                 if(resultHandle) {
                     resultHandle(procImage);
-                }
-                else{
+                } else {
                     LOG_INFO("face detect not result handler\n");
                     continue;
                 }
             }
 
-        }
-        else{
+        } else {
             LOG_INFO("This image is not a face, ignore it\n");
         }
 
@@ -144,14 +141,12 @@ void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip, DetectRes
     }
 }
 
-
 float FaceOperator::calculate_distance(const cv::Mat& feature1, const cv::Mat& feature2, const int distFlag) {
     float dist = 0.0;
     if (distFlag == 1) {
         dist = cv::norm(feature1, feature2, cv::NORM_L2);
         //dist = 1 / (1 + dist);
-    }
-    else if (distFlag == 2) {
+    } else if (distFlag == 2) {
         float ab = feature1.dot(feature2);
         float aa = feature1.dot(feature1);
         float bb = feature2.dot(feature2);
@@ -183,8 +178,7 @@ void FaceOperator::linear_search(const cv::Mat& data, const cv::Mat& point,
     if (distFlag == 1) {
         cv::flann::Index flannIndex(data, cv::flann::LinearIndexParams(), cvflann::FLANN_DIST_EUCLIDEAN);
         flannIndex.knnSearch(point, indices, dists, k, cv::flann::SearchParams(64));
-    }
-    else {
+    } else {
         cv::flann::Index flannIndex(data, cv::flann::LinearIndexParams(), cvflann::FLANN_DIST_L2);
         flannIndex.knnSearch(point, indices, dists, k, cv::flann::SearchParams(64));
     }
@@ -227,8 +221,7 @@ int FaceOperator::dlib_img_2_mat(dlib::array2d<dlib::rgb_pixel>&in, cv::Mat &out
     out = tempM.clone();
     if (out.dims > 1) {		// if dims greats than 1, we say that out has valid data.
         return 1;
-    }
-    else {
+    } else {
         return 0;
     }
 }
@@ -238,8 +231,7 @@ int FaceOperator::get_normalization_face2(const char* inputFileName, cv::Mat& fa
 
     if (targetWidth <= 20) {
         targetWidth = 20;
-    }
-    else if (targetWidth > 256) {
+    } else if (targetWidth > 256) {
         targetWidth = 256;
     }
     try {
@@ -254,28 +246,23 @@ int FaceOperator::get_normalization_face2(const char* inputFileName, cv::Mat& fa
         int origHeight = picHeight;
         double scaleFactor = 1.0;
 
-        while ((picWidth*picHeight) <= (80 * 80) && scaleCount++ < 1) {
-            pyramid_up(img);
-            picWidth = img.nc();
-            picHeight = img.nr();
-        }
-        while ((picWidth*picHeight) > (1000 * 640 * 1)) {
-            pyr(img, temp);
-            swap(temp, img);
-            picWidth = img.nc();
-            picHeight = img.nr();
-        }
+//        while ((picWidth*picHeight) <= (80 * 80) && scaleCount++ < 1) {
+//            pyramid_up(img);
+//            picWidth = img.nc();
+//            picHeight = img.nr();
+//        }
+//        while ((picWidth*picHeight) > (1000 * 640 * 1)) {
+//            pyr(img, temp);
+//            swap(temp, img);
+//            picWidth = img.nc();
+//            picHeight = img.nr();
+//        }
 
         scaleFactor = picWidth / origWidth;
 
-//        m_mutex.lock();
         _classifierMutex.lock();
         std::vector<dlib::rectangle> dets;
-//        if (NULL != pClassifier){
-//            dets = ((Classifier *)pClassifier)->detector(img);
         dets = _classifier.detector(img);
-//        }
-//        m_mutex.unlock();
         _classifierMutex.unlock();
 
         sched_yield();
@@ -302,26 +289,20 @@ int FaceOperator::get_normalization_face2(const char* inputFileName, cv::Mat& fa
         if (index >= 0) {
             dlib::full_object_detection shape;
             _classifierMutex.lock();
-            _classifier.sp(img, dets[index]);
+            shape = _classifier.sp(img, dets[index]);
             _classifierMutex.unlock();
-//            m_mutex.lock();
-//            if(NULL != pClassifier) {
-//                shape = ((Classifier *)pClassifier)->sp(img, dets[index]);
-//            }
-//            m_mutex.unlock();
             shapes.push_back(shape);
         }
         if(0 == shapes.size()) {
             cout << "image's point is null!" << endl;
-            return -1;
+            return -2;
         }
         dlib::array<dlib::array2d<dlib::rgb_pixel> > face_chips;
         dlib::extract_image_chips(img, get_face_chip_details(shapes, targetWidth, 0.2), face_chips);
         cv::Mat tempFace;
         dlib_img_2_mat(face_chips[0], tempFace);
         face = tempFace.clone();
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         std::cout << "\nexception thrown!" << std::endl;
         std::cout << e.what() << std::endl;
         return -4;
@@ -339,12 +320,13 @@ int FaceOperator::extractFeature(const std::string& imagePath, std::vector<float
 
         string extName = getExtName(imagePath);
         if (!IsImg(extName)) {
-            return -1; // invalid picture
+            return -101; // invalid picture
         }
         cv::Mat face;
-        if (get_normalization_face2(imagePath.c_str(), face, imgSize) != 0) {
+        int ret = 0;
+        if ((ret = get_normalization_face2(imagePath.c_str(), face, imgSize)) != 0) {
             std::cout << "No face is detected in the image" << imagePath << std::endl;
-            return -2;
+            return ret;
         }
         if (scale == 1) {
             face = face / 255;
@@ -352,17 +334,10 @@ int FaceOperator::extractFeature(const std::string& imagePath, std::vector<float
         _classifierMutex.lock();
         _classifier.get_feature(face).swap(feature);
         _classifierMutex.unlock();
-//        m_mutex.lock();
-//        if (NULL != pClassifier) {
-//            feature = ((Classifier *)pClassifier)->get_feature(face);
-//        }
-//        m_mutex.unlock();
-
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         std::cout << "\nexception thrown!" << std::endl;
         std::cout << e.what() << std::endl;
-        return -4;
+        return -102;
     }
 }
 

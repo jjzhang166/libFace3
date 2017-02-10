@@ -27,7 +27,8 @@ public:
     HCNetWrapper(const std::string& ip, int port,
                  const std::string& uname,const std::string& passwd,
                  const std::string channel)
-        :_lUserID(-1), _cbRealData(NULL), _cbData(NULL) {
+        :_lUserID(-1), _cbRealData(NULL), _cbData(NULL)
+    {
         //init device
         NET_DVR_Init();
         //set connect time and reconnect time
@@ -40,6 +41,7 @@ public:
         _config.passwd = passwd;
         _config.channel = channel;
     }
+
     ~HCNetWrapper() {
         //release resource of SDK
         NET_DVR_Cleanup();

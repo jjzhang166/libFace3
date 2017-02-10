@@ -35,7 +35,6 @@ void CameraOperator::handleFrameFromRtspCamera(std::string rtspAddress, Handler 
 
     Mat image;
     VideoCapture vcap;
-
     vcap.open(rtspAddress);
     //open the usb camera and make sure it's opened
     if (!vcap.isOpened()) {
@@ -64,7 +63,6 @@ void CameraOperator::handleFrameFromUSBCamera(Handler handler) {
     Mat image;
     VideoCapture vcap;
     vcap.open(0);
-
     //open the usb camera and make sure it's opened
     if (!vcap.isOpened()) {
         cout << "Error opening video stream or file" << endl;
@@ -86,7 +84,7 @@ void CameraOperator::handleFrameFromUSBCamera(Handler handler) {
 void CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handler) {
     using namespace cv;
     using namespace std;
-    try  {
+    try {
         LONG lUserID = hcNet.loginV30();
         if (lUserID < 0) {
             cout << "Login Error---" << hcNet.getLastError() << endl;
@@ -109,8 +107,7 @@ void CameraOperator::handleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handle
         hcNet.stopRealPlay(lRealPlayHandle);
         hcNet.loginOut();
         return;
-    }
-    catch (exception& e) {
+    } catch (exception& e) {
         cout << "\nexception thrown!" << endl;
         cout << e.what() << endl;
         throw;

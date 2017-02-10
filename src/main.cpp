@@ -18,9 +18,30 @@ void detectResultHandle(cv::Mat res) {
     indexFile++;
     cv::imwrite(fileName, res);
 
+    timeval start, end;
+    gettimeofday(&start, NULL);
+
     std::vector<float> feature;
     int ret =FaceOperator::extractFeature(fileName, feature);
+    unlink(fileName);
+
     LOG_INFO("return code: %d\n", ret);
+    if(ret == 0){
+        LOG_INFO("Get the face feature, feature cols: %d.\nfeature code: \n", feature.size());
+        for(int i = 0; i < feature.size(); ++i){
+            if(i %  10) {
+                std::cout << feature[i] << " ";
+            } else {
+                std::cout << "\n";
+            }
+        }
+        std::cout << "\n";
+    }
+
+    gettimeofday(&end, NULL);
+    int tmp = 1000000;
+    long double payTime = (tmp * (end.tv_sec - start.tv_sec)) + (end.tv_usec - start.tv_usec);
+    std::cerr << "extract feature pay time is:" <<  payTime / tmp << " s\n";
 
     std::thread show([&]() {
         cv::imshow("abc", res);
@@ -28,7 +49,6 @@ void detectResultHandle(cv::Mat res) {
     });
     show.join();
 }
-
 
 int main(int argc, char *argv[]) {
     bool loadResult = FaceOperator::loadCascadeClassifier("./resource/haarcascade_frontalface_alt.xml");
@@ -40,11 +60,11 @@ int main(int argc, char *argv[]) {
     CameraOperator::Handler handle = [](cv::Mat mat) {
         cv::imshow("use camera", mat);
         cv::waitKey(1);
-        std::thread task(&FaceOperator::faceDetect, mat, 1.0, true, detectResultHandle);
-        task.detach();
+        FaceOperator::faceDetect(mat, 1.0, true, detectResultHandle);
+//        std::thread task(&FaceOperator::faceDetect, mat, 1.0, true, detectResultHandle);
+//        task.detach();
     };
 
     CameraOperator::handleFrameFromUSBCamera(handle);
-
     return 0;
 }

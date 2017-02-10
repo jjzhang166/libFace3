@@ -19,10 +19,11 @@ int IsImg(string extName) {
             || !extName.compare("JPEG") || !extName.compare("BMP") || !extName.compare("png")
             || !extName.compare("PNG")) {
         return 1;
-    }
-    else {
+    } else {
         return 0;
     }
 }
+
+
 
 #endif // UTILITY_HPP
