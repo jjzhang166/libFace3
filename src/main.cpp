@@ -1,7 +1,8 @@
 #include "FaceOperator.hpp"
 #include "CameraOperator.hpp"
 
-#include <opencv2/core.hpp>
+//#include <opencv2/core.hpp>
+#include <opencv2/core/core.hpp>
 
 #include <cstdio>
 #include <cstdlib>

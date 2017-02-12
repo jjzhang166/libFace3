@@ -11,11 +11,9 @@ LOCAL_C_LIBRARIES := -L ${LOCAL_PATH} \
 					-L ${LOCAL_PATH}/camera/HCNet/lib \
 					-L ${LOCAL_PATH}/caffe/lib \
 					-L ${LOCAL_PATH}/dlib-18.18 \
-					-L /usr/local/lib
 
 
-
-LOCAL_SHARE_LIB := -lcblas -lboost_system -lcurl -lb64 \
+LOCAL_SHARE_LIB := -lcblas -lboost_system \
 				-lopencv_core -lopencv_highgui -lopencv_imgproc \
 				-lopencv_flann -lopencv_objdetect -lopencv_video\
 				-lhcnetsdk -lPlayCtrl -lAudioRender -lSuperRender \
@@ -27,7 +25,8 @@ INCLUDE := -I ${LOCAL_PATH}/include \
 			-I ${LOCAL_PATH}/camera/include/ \
 			-I ${LOCAL_PATH}/caffe/include \
 			-I ${LOCAL_PATH}/dlib-18.18/ \
-			-I /usr/local/include/opencv \
+			-I /usr/include/opencv \
+			-I /usr/include/opencv2/core
 
 CPPFLAGS := 
 CFLAGS :=
