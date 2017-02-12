@@ -22,17 +22,19 @@ public:
     static bool loadCascadeClassifier(const std::string& fliePath);
     static void faceDetect(cv::Mat img, double scale, bool tryflip, DetectResHandle resultHandle);
     static int extractFeature(const std::string& imagePath, std::vector<float>& feature);
-    static void faceRecognition(cv::Mat feature, std::vector<cv::Mat> featureSet, int num = 1);
+    static void faceRecognition(cv::Mat recognizeFeature, cv::Mat srcFeature, float& similary);
+    static void faceRecognition(cv::Mat recognizeFeature, const std::vector<cv::Mat>& featureSet,
+                                   std::vector<int>& indices, std::vector<float>& dists);
 
 private:
-    inline double randf() {
+    static inline double randf() {
         return (double)(rand() / (double)RAND_MAX); // produce 0 ~ 1 float number.
     }
-    float calculate_distance(const cv::Mat& feature1, const cv::Mat& feature2, const int distFlag);
-    float process_similarity(float dist);
-    void linear_search(const cv::Mat& data, const cv::Mat& point,
+    static float calculate_distance(const cv::Mat& feature1, const cv::Mat& feature2, const int distFlag);
+    static float process_similarity(float dist);
+    static void linear_search(const cv::Mat& data, const cv::Mat& point,
                        cv::Mat& indices, cv::Mat& dists, const int k, int distFlag);
-    void knn_search(const cv::Mat& data, const cv::Mat& point,
+    static void knn_search(const cv::Mat& data, const cv::Mat& point,
                     std::vector<int>& indices, std::vector<float>& dists, const int k, int distFlag);
 
     static int dlib_img_2_mat(dlib::array2d<dlib::rgb_pixel>& in, cv::Mat &out);
@@ -341,6 +343,25 @@ int FaceOperator::extractFeature(const std::string& imagePath, std::vector<float
     }
 }
 
+void FaceOperator::faceRecognition(cv::Mat recognizeFeature, cv::Mat srcFeature, float &similary) {
+    int k;
+    std::vector<int> indices(srcFeature.rows);
+    std::vector<float> dists(srcFeature.rows);
+    knn_search(srcFeature, recognizeFeature, indices, dists, k, 2);
+    similary = dists[0];
+}
+
+void FaceOperator::faceRecognition(cv::Mat recognizeFeature, const std::vector<cv::Mat>& featureSet,
+                                   std::vector<int>& indices, std::vector<float>& dists) {
+    cv::Mat featureSetTmp = cv::Mat::zeros(featureSet.size(), 256, CV_32FC1);
+    for(int i = 0; i < featureSet.size(); ++i) {
+        for(int j = 0; j < featureSet[i].cols; ++j) {
+            featureSetTmp.at<float>(i, j) = featureSet[i].at<float>(0, j);
+        }
+    }
+    int k;
+    knn_search(featureSetTmp, recognizeFeature, indices, dists, k, 2);
+}
 
 
 #endif // FaceOperator_H
