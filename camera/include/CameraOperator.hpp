@@ -1,7 +1,6 @@
 #ifndef CameraOperator_H
 #define CameraOperator_H
 
-#include "Log.hpp"
 #include "HCNetWrapper.hpp"
 
 #include <opencv2/opencv.hpp>
