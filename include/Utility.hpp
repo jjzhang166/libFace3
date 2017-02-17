@@ -2,7 +2,7 @@
 #define UTILITY_HPP
 
 
-string getExtName(string filePath) {
+string GetExtName(string filePath) {
     string filename = filePath;
 
     // Remove extension if present.

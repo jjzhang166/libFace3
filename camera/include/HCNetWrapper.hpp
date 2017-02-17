@@ -47,7 +47,7 @@ public:
         NET_DVR_Cleanup();
     }
 
-    inline int loginV30() {
+    inline int LoginV30() {
         //lUserID = NET_DVR_Login_V30("192.168.1.64", 8000, "admin", "qy38888813", &struDeviceInfo);
         _lUserID = NET_DVR_Login_V30((char*)_config.cameraIP.c_str(), _config.cameraPort,
                                      (char*)_config.username.c_str(), (char*)_config.passwd.c_str(),
@@ -55,11 +55,11 @@ public:
         return _lUserID;
     }
 
-    inline void loginOut() {
+    inline void LoginOut() {
         NET_DVR_Logout(_lUserID);
     }
 
-    inline DWORD getLastError() const {
+    inline DWORD GetLastError() const {
         return NET_DVR_GetLastError();
     }
 
@@ -67,22 +67,22 @@ public:
     //预览通道号
     //0-主码流，1-子码流，2-码流3，3-码流4，以此类推
     //0- TCP方式，1- UDP方式，2- 多播方式，3- RTP方式，4-RTP/RTSP，5-RSTP/HTTP
-    inline void setPlayInfo(int hPlayWnd, int lChannel, int dwStreamType, int dwLinkMode) {
+    inline void SetPlayInfo(int hPlayWnd, int lChannel, int dwStreamType, int dwLinkMode) {
         _struPlayInfo.hPlayWnd = hPlayWnd;
         _struPlayInfo.lChannel = lChannel;
         _struPlayInfo.dwStreamType = dwStreamType;
         _struPlayInfo.dwLinkMode = dwLinkMode;
     }
 
-    inline int realPlayV40() {
+    inline int RealPlayV40() {
         return NET_DVR_RealPlay_V40(_lUserID, &_struPlayInfo, _cbRealData , _cbData);
     }
 
-    inline void stopRealPlay(LONG realPlay) {
+    inline void StopRealPlay(LONG realPlay) {
         NET_DVR_StopRealPlay(realPlay);
     }
 
-    inline void setRealDataCallBack(RealDataCallBack cb, void* pData = NULL) {
+    inline void SetRealDataCallBack(RealDataCallBack cb, void* pData = NULL) {
         _cbRealData = cb;
         _cbData = pData;
     }

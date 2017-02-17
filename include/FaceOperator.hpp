@@ -19,30 +19,30 @@ public:
     typedef std::function<void(cv::Mat)> DetectResHandle;
 
 public:
-    static bool loadCascadeClassifier(const std::string& fliePath);
-    static void faceDetect(cv::Mat img, double scale, bool tryflip, DetectResHandle resultHandle);
-    static int extractFeature(const std::string& imagePath, std::vector<float>& feature);
-    static void faceRecognition(cv::Mat recognizeFeature, cv::Mat srcFeature, float& similary);
-    static void faceRecognition(cv::Mat recognizeFeature, const std::vector<cv::Mat>& featureSet,
+    static bool LoadCascadeClassifier(const std::string& fliePath);
+    static void FaceDetect(cv::Mat img, double scale, bool tryflip, DetectResHandle resultHandle);
+    static int ExtractFeature(const std::string& imagePath, std::vector<float>& feature);
+    static void FaceRecognition(cv::Mat recognizeFeature, cv::Mat srcFeature, float& similary);
+    static void FaceRecognition(cv::Mat recognizeFeature, const std::vector<cv::Mat>& featureSet,
                                    std::vector<int>& indices, std::vector<float>& dists);
 
 private:
-    static inline double randf() {
+    static inline double Randf() {
         return (double)(rand() / (double)RAND_MAX); // produce 0 ~ 1 float number.
     }
-    static float calculate_distance(const cv::Mat& feature1, const cv::Mat& feature2, const int distFlag);
-    static float process_similarity(float dist);
-    static void linear_search(const cv::Mat& data, const cv::Mat& point,
+    static float CalculateDistance(const cv::Mat& feature1, const cv::Mat& feature2, const int distFlag);
+    static float ProcessSimilarity(float dist);
+    static void LinearSearch(const cv::Mat& data, const cv::Mat& point,
                        cv::Mat& indices, cv::Mat& dists, const int k, int distFlag);
-    static void knn_search(const cv::Mat& data, const cv::Mat& point,
+    static void KnnSearch(const cv::Mat& data, const cv::Mat& point,
                     std::vector<int>& indices, std::vector<float>& dists, const int k, int distFlag);
 
-    static int dlib_img_2_mat(dlib::array2d<dlib::rgb_pixel>& in, cv::Mat &out);
-    static int get_normalization_face2(const char* inputFileName, cv::Mat& face, int targetWidth);
+    static int DlibImg2Mat(dlib::array2d<dlib::rgb_pixel>& in, cv::Mat &out);
+    static int GetNormalizationFace(const char* inputFileName, cv::Mat& face, int targetWidth);
 
 private:
-    static std::mutex m_ClassierMutex;
-    static cv::CascadeClassifier m_CascadeClassier;
+    static std::mutex _classierMutex;
+    static cv::CascadeClassifier _cascadeClassier;
 
     static Classifier _classifier;
     static std::mutex _classifierMutex;
@@ -55,8 +55,8 @@ private:
 };
 
 /* below is static variable define */
-std::mutex FaceOperator::m_ClassierMutex;
-cv::CascadeClassifier FaceOperator::m_CascadeClassier;
+std::mutex FaceOperator::_classierMutex;
+cv::CascadeClassifier FaceOperator::_cascadeClassier;
 Classifier FaceOperator::_classifier = Classifier(std::string("./resource/deploy.prototxt"),
                                                   std::string("./resource/face.model"), 1);
 std::mutex FaceOperator::_classifierMutex;
@@ -66,11 +66,11 @@ float FaceOperator::distScale2 = 0.6;
 
 /* below is static function define */
 
-bool FaceOperator::loadCascadeClassifier(const std::string &fliePath) {
-    return m_CascadeClassier.load(fliePath);
+bool FaceOperator::LoadCascadeClassifier(const std::string &fliePath) {
+    return _cascadeClassier.load(fliePath);
 }
 
-void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip, DetectResHandle resultHandle) {
+void FaceOperator::FaceDetect(cv::Mat img, double scale, bool tryflip, DetectResHandle resultHandle) {
     using namespace cv;
     using namespace std;
     try {
@@ -98,11 +98,11 @@ void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip, DetectRes
         resize(gray, smallImg, smallImg.size(), 0, 0, INTER_LINEAR);
         equalizeHist(smallImg, smallImg);
 
-        if(!m_ClassierMutex.try_lock()) {
+        if(!_classierMutex.try_lock()) {
             cout << "CascadeClassie is working" << endl;
             return;
         }
-        m_CascadeClassier.detectMultiScale(smallImg, faces,
+        _cascadeClassier.detectMultiScale(smallImg, faces,
                                            1.1, 2, 0
                                            //|CV_HAAR_FIND_BIGGEST_OBJECT
                                            //|CV_HAAR_DO_ROUGH_SEARCH
@@ -110,7 +110,7 @@ void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip, DetectRes
                                            Size(30, 30));
         if (tryflip) {
             flip(smallImg, smallImg, 1);
-            m_CascadeClassier.detectMultiScale(smallImg, faces2,
+            _cascadeClassier.detectMultiScale(smallImg, faces2,
                                                1.1, 2, 0 | CV_HAAR_SCALE_IMAGE,
                                                Size(30, 30));
             cout << "faces2.size():" << faces2.size() << endl;
@@ -118,7 +118,7 @@ void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip, DetectRes
                 faces.push_back(Rect(smallImg.cols - r->x - r->width, r->y, r->width, r->height));
             }
         }
-        m_ClassierMutex.unlock();
+        _classierMutex.unlock();
 
         if (faces.size() > 0) {
             LOG_INFO("~~~~~~~~~~~~~~faces count: %d~~~~~~~~~~~~~~\n", faces.size());
@@ -143,7 +143,7 @@ void FaceOperator::faceDetect(cv::Mat img, double scale, bool tryflip, DetectRes
     }
 }
 
-float FaceOperator::calculate_distance(const cv::Mat& feature1, const cv::Mat& feature2, const int distFlag) {
+float FaceOperator::CalculateDistance(const cv::Mat& feature1, const cv::Mat& feature2, const int distFlag) {
     float dist = 0.0;
     if (distFlag == 1) {
         dist = cv::norm(feature1, feature2, cv::NORM_L2);
@@ -159,7 +159,7 @@ float FaceOperator::calculate_distance(const cv::Mat& feature1, const cv::Mat& f
     return dist;
 }
 
-float FaceOperator::process_similarity(float dist) {
+float FaceOperator::ProcessSimilarity(float dist) {
     float oldDist = dist;
     float T = 0.75;
     float similarity = dist + (dist - T)*distScale2;
@@ -170,12 +170,12 @@ float FaceOperator::process_similarity(float dist) {
         similarity = 0.01;
     }
     if (oldDist != 1 && oldDist>T) {
-        similarity = similarity - randf() / 100;
+        similarity = similarity - Randf() / 100;
     }
     return similarity;
 }
 
-void FaceOperator::linear_search(const cv::Mat& data, const cv::Mat& point,
+void FaceOperator::LinearSearch(const cv::Mat& data, const cv::Mat& point,
                    cv::Mat& indices, cv::Mat& dists, const int k, int distFlag) {
     if (distFlag == 1) {
         cv::flann::Index flannIndex(data, cv::flann::LinearIndexParams(), cvflann::FLANN_DIST_EUCLIDEAN);
@@ -186,13 +186,13 @@ void FaceOperator::linear_search(const cv::Mat& data, const cv::Mat& point,
     }
 }
 
-void FaceOperator::knn_search(const cv::Mat& data, const cv::Mat& point,
+void FaceOperator::KnnSearch(const cv::Mat& data, const cv::Mat& point,
                 std::vector<int>& indices, std::vector<float>& dists, const int k, int distFlag) {
     cv::vector<float> tempDist(data.rows,0);
     #pragma omp parallel for
     for (int i = 0; i < data.rows; i++) {
         //tempDist.push_back(calculate_distance(data.row(i), point, distFlag));
-        tempDist[i] = calculate_distance(data.row(i), point, distFlag);
+        tempDist[i] = CalculateDistance(data.row(i), point, distFlag);
     }
     if (distFlag == 1) {	// 欧式距离，从小到大排列
         std::size_t n(0);
@@ -215,7 +215,7 @@ void FaceOperator::knn_search(const cv::Mat& data, const cv::Mat& point,
 
 }
 
-int FaceOperator::dlib_img_2_mat(dlib::array2d<dlib::rgb_pixel>&in, cv::Mat &out) {
+int FaceOperator::DlibImg2Mat(dlib::array2d<dlib::rgb_pixel>&in, cv::Mat &out) {
     cv::Mat tempM;
     tempM = dlib::toMat(in);
     cv::Mat dstTypeM = cv::Mat(tempM.rows, tempM.cols, CV_32F);
@@ -228,7 +228,7 @@ int FaceOperator::dlib_img_2_mat(dlib::array2d<dlib::rgb_pixel>&in, cv::Mat &out
     }
 }
 
-int FaceOperator::get_normalization_face2(const char* inputFileName, cv::Mat& face, int targetWidth) {
+int FaceOperator::GetNormalizationFace(const char* inputFileName, cv::Mat& face, int targetWidth) {
     using namespace std;
 
     if (targetWidth <= 20) {
@@ -302,7 +302,7 @@ int FaceOperator::get_normalization_face2(const char* inputFileName, cv::Mat& fa
         dlib::array<dlib::array2d<dlib::rgb_pixel> > face_chips;
         dlib::extract_image_chips(img, get_face_chip_details(shapes, targetWidth, 0.2), face_chips);
         cv::Mat tempFace;
-        dlib_img_2_mat(face_chips[0], tempFace);
+        DlibImg2Mat(face_chips[0], tempFace);
         face = tempFace.clone();
     } catch (std::exception& e) {
         std::cout << "\nexception thrown!" << std::endl;
@@ -313,20 +313,20 @@ int FaceOperator::get_normalization_face2(const char* inputFileName, cv::Mat& fa
     return 0;
 }
 
-int FaceOperator::extractFeature(const std::string& imagePath, std::vector<float>& feature) {
+int FaceOperator::ExtractFeature(const std::string& imagePath, std::vector<float>& feature) {
     using namespace std;
     try {
         int imgSize = 128;
         int feature_dim = 256;
         int scale = 1;
 
-        string extName = getExtName(imagePath);
+        string extName = GetExtName(imagePath);
         if (!IsImg(extName)) {
             return -101; // invalid picture
         }
         cv::Mat face;
         int ret = 0;
-        if ((ret = get_normalization_face2(imagePath.c_str(), face, imgSize)) != 0) {
+        if ((ret = GetNormalizationFace(imagePath.c_str(), face, imgSize)) != 0) {
             std::cout << "No face is detected in the image" << imagePath << std::endl;
             return ret;
         }
@@ -334,7 +334,7 @@ int FaceOperator::extractFeature(const std::string& imagePath, std::vector<float
             face = face / 255;
         }
         _classifierMutex.lock();
-        _classifier.get_feature(face).swap(feature);
+        _classifier.GetFeature(face).swap(feature);
         _classifierMutex.unlock();
     } catch (std::exception& e) {
         std::cout << "\nexception thrown!" << std::endl;
@@ -343,15 +343,15 @@ int FaceOperator::extractFeature(const std::string& imagePath, std::vector<float
     }
 }
 
-void FaceOperator::faceRecognition(cv::Mat recognizeFeature, cv::Mat srcFeature, float &similary) {
+void FaceOperator::FaceRecognition(cv::Mat recognizeFeature, cv::Mat srcFeature, float &similary) {
     int k;
     std::vector<int> indices(srcFeature.rows);
     std::vector<float> dists(srcFeature.rows);
-    knn_search(srcFeature, recognizeFeature, indices, dists, k, 2);
+    KnnSearch(srcFeature, recognizeFeature, indices, dists, k, 2);
     similary = dists[0];
 }
 
-void FaceOperator::faceRecognition(cv::Mat recognizeFeature, const std::vector<cv::Mat>& featureSet,
+void FaceOperator::FaceRecognition(cv::Mat recognizeFeature, const std::vector<cv::Mat>& featureSet,
                                    std::vector<int>& indices, std::vector<float>& dists) {
     cv::Mat featureSetTmp = cv::Mat::zeros(featureSet.size(), 256, CV_32FC1);
     for(int i = 0; i < featureSet.size(); ++i) {
@@ -360,7 +360,7 @@ void FaceOperator::faceRecognition(cv::Mat recognizeFeature, const std::vector<c
         }
     }
     int k;
-    knn_search(featureSetTmp, recognizeFeature, indices, dists, k, 2);
+    KnnSearch(featureSetTmp, recognizeFeature, indices, dists, k, 2);
 }
 
 

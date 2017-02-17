@@ -12,7 +12,7 @@
 const int STRING_FILENAME_LENGTH = 128;
 static int indexFile = 0;
 
-void detectResultHandle(cv::Mat res) {
+void DetectResultHandle(cv::Mat res) {
     //Mat saveImage(smallImg, Rect((smallImg.cols - r->x - r->width)*scale, r->y*scale, r->width*scale, r->height*scale));
     char fileName[STRING_FILENAME_LENGTH]{0};
     snprintf(fileName, STRING_FILENAME_LENGTH, "./image/test%d.jpg", indexFile);
@@ -24,7 +24,7 @@ void detectResultHandle(cv::Mat res) {
 
     std::vector<float> feature;
     cv::Mat srcFeature = cv::Mat::zeros(1, 256, CV_32FC1);
-    int ret = FaceOperator::extractFeature(fileName, feature);
+    int ret = FaceOperator::ExtractFeature(fileName, feature);
     unlink(fileName);
 
     LOG_INFO("return code: %d\n", ret);
@@ -47,7 +47,7 @@ void detectResultHandle(cv::Mat res) {
     std::cerr << "extract feature pay time is:" <<  payTime / tmp << " s\n";
 
     float simi = -1;
-    FaceOperator::faceRecognition(srcFeature, srcFeature, simi);
+    FaceOperator::FaceRecognition(srcFeature, srcFeature, simi);
     std::cerr << "face recognition similary: " << simi << "\n";
 
     std::thread show([&]() {
@@ -58,7 +58,7 @@ void detectResultHandle(cv::Mat res) {
 }
 
 int main(int argc, char *argv[]) {
-    bool loadResult = FaceOperator::loadCascadeClassifier("./resource/haarcascade_frontalface_alt.xml");
+    bool loadResult = FaceOperator::LoadCascadeClassifier("./resource/haarcascade_frontalface_alt.xml");
     if(false == loadResult) {
         std::cerr << "load cascadfliePathe classier failed\n";
         exit(EXIT_FAILURE);
@@ -67,11 +67,11 @@ int main(int argc, char *argv[]) {
     CameraOperator::Handler handle = [](cv::Mat mat) {
         cv::imshow("use camera", mat);
         cv::waitKey(1);
-        FaceOperator::faceDetect(mat, 1.0, true, detectResultHandle);
+        FaceOperator::FaceDetect(mat, 1.0, true, DetectResultHandle);
 //        std::thread task(&FaceOperator::faceDetect, mat, 1.0, true, detectResultHandle);
 //        task.detach();
     };
 
-    CameraOperator::handleFrameFromUSBCamera(handle);
+    CameraOperator::HandleFrameFromUSBCamera(handle);
     return 0;
 }
