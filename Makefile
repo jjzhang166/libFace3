@@ -8,7 +8,6 @@ LOCAL_STATIC_MACRO := -D CPU_ONLY=1 -D DLIB_JPEG_SUPPORT -D DLIB_PNG_SUPPORT
 
 LOCAL_C_LIBRARIES := -L ${LOCAL_PATH} \
 					-L ${LOCAL_PATH}/lib \
-					-L ${LOCAL_PATH}/camera/HCNet/lib \
 					-L ${LOCAL_PATH}/caffe/lib \
 					-L ${LOCAL_PATH}/dlib-18.18 \
 
@@ -16,12 +15,10 @@ LOCAL_C_LIBRARIES := -L ${LOCAL_PATH} \
 LOCAL_SHARE_LIB := -lcblas -lboost_system \
 				-lopencv_core -lopencv_highgui -lopencv_imgproc \
 				-lopencv_flann -lopencv_objdetect -lopencv_video\
-				-lhcnetsdk -lPlayCtrl -lAudioRender -lSuperRender \
 				-lcaffe -ldlib -ljpeg -lpng -lglog \
 				-pthread
 
 INCLUDE := -I ${LOCAL_PATH}/include \
-			-I ${LOCAL_PATH}/camera/HCNet/ \
 			-I ${LOCAL_PATH}/camera/include/ \
 			-I ${LOCAL_PATH}/caffe/include \
 			-I ${LOCAL_PATH}/dlib-18.18/ \

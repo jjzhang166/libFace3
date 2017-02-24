@@ -344,9 +344,9 @@ int FaceOperator::ExtractFeature(const std::string& imagePath, std::vector<float
 }
 
 void FaceOperator::FaceRecognition(cv::Mat recognizeFeature, cv::Mat srcFeature, float &similary) {
-    int k;
     std::vector<int> indices(srcFeature.rows);
     std::vector<float> dists(srcFeature.rows);
+    int k;
     KnnSearch(srcFeature, recognizeFeature, indices, dists, k, 2);
     similary = dists[0];
 }

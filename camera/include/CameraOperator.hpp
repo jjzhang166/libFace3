@@ -1,8 +1,6 @@
 #ifndef CameraOperator_H
 #define CameraOperator_H
 
-#include "HCNetWrapper.hpp"
-
 #include <opencv2/opencv.hpp>
 
 #include <iostream>
@@ -21,7 +19,6 @@ public:
     /* prototype */
     static void HandleFrameFromRtspCamera(std::string rtspAddress, Handler handler);
     static void HandleFrameFromUSBCamera(Handler handle);
-    static void HandleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handle);
     static void HandleFrameFromImage(std::string imagePath, Handler handle);
 };
 
@@ -54,7 +51,6 @@ void CameraOperator::HandleFrameFromRtspCamera(std::string rtspAddress, Handler 
     }
 }
 
-
 void CameraOperator::HandleFrameFromUSBCamera(Handler handler) {
     using namespace cv;
     using namespace std;
@@ -80,39 +76,6 @@ void CameraOperator::HandleFrameFromUSBCamera(Handler handler) {
     }
 }
 
-void CameraOperator::HandleFrameFromHCNetSDK(HCNetWrapper& hcNet, Handler handler) {
-    using namespace cv;
-    using namespace std;
-    try {
-        LONG lUserID = hcNet.LoginV30();
-        if (lUserID < 0) {
-            cout << "Login Error---" << hcNet.GetLastError() << endl;
-            return;
-        }
-
-        // start preview and callBack stream
-        LONG lRealPlayHandle;
-        hcNet.SetPlayInfo(0, 1, 0, 0);
-        lRealPlayHandle = hcNet.RealPlayV40();
-
-        cout << "lRealPlayHandle:" << lRealPlayHandle << endl;
-        if(lRealPlayHandle < 0) {
-            cout << "NET_DVR_RealPlay_V40 error---" << hcNet.GetLastError() << endl;
-            hcNet.LoginOut();
-        }
-        waitKey();
-        sleep(-1); // TODO
-
-        hcNet.StopRealPlay(lRealPlayHandle);
-        hcNet.LoginOut();
-        return;
-    } catch (exception& e) {
-        cout << "\nexception thrown!" << endl;
-        cout << e.what() << endl;
-        throw;
-    }
-}
-
 void CameraOperator::HandleFrameFromImage(std::string imagePath, Handler handler) {
     using namespace cv;
     using namespace std;
@@ -126,9 +89,6 @@ void CameraOperator::HandleFrameFromImage(std::string imagePath, Handler handler
     }
 //    waitKey(5000);
 }
-
-
-
 
 
 #endif // CameraOperator_H

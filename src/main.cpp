@@ -13,7 +13,6 @@ const int STRING_FILENAME_LENGTH = 128;
 static int indexFile = 0;
 
 void DetectResultHandle(cv::Mat res) {
-    //Mat saveImage(smallImg, Rect((smallImg.cols - r->x - r->width)*scale, r->y*scale, r->width*scale, r->height*scale));
     char fileName[STRING_FILENAME_LENGTH]{0};
     snprintf(fileName, STRING_FILENAME_LENGTH, "./image/test%d.jpg", indexFile);
     indexFile++;
@@ -67,9 +66,8 @@ int main(int argc, char *argv[]) {
     CameraOperator::Handler handle = [](cv::Mat mat) {
         cv::imshow("use camera", mat);
         cv::waitKey(1);
-        FaceOperator::FaceDetect(mat, 1.0, true, DetectResultHandle);
-//        std::thread task(&FaceOperator::faceDetect, mat, 1.0, true, detectResultHandle);
-//        task.detach();
+        std::thread task(&FaceOperator::FaceDetect, mat, 1.0, true, DetectResultHandle);
+        task.detach();
     };
 
     CameraOperator::HandleFrameFromUSBCamera(handle);
