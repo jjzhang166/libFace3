@@ -1,9 +1,11 @@
-#ifndef UTILITY_HPP
-#define UTILITY_HPP
+#include "libFace/Utility.h"
 
 
-string GetExtName(string filePath) {
-    string filename = filePath;
+namespace libface {
+
+
+std::string GetExtName(std::string filePath) {
+    std::string filename = filePath;
 
     // Remove extension if present.
     const size_t period_idx = filename.rfind('.');
@@ -13,7 +15,7 @@ string GetExtName(string filePath) {
     return filename;
 }
 
-int IsImg(string extName) {
+int IsImg(std::string extName) {
     if (!extName.compare("jpg") || !extName.compare("jpeg")
             || !extName.compare("bmp") || !extName.compare("tiff") || !extName.compare("JPG")
             || !extName.compare("JPEG") || !extName.compare("BMP") || !extName.compare("png")
@@ -25,5 +27,4 @@ int IsImg(string extName) {
 }
 
 
-
-#endif // UTILITY_HPP
+}	// namespace libface

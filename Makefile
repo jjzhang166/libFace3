@@ -19,7 +19,6 @@ LOCAL_SHARE_LIB := -lcblas -lboost_system \
 				-pthread
 
 INCLUDE := -I ${LOCAL_PATH}/include \
-			-I ${LOCAL_PATH}/camera/include/ \
 			-I ${LOCAL_PATH}/caffe/include \
 			-I ${LOCAL_PATH}/dlib-18.18/ \
 			-I /usr/include/opencv \
@@ -31,6 +30,8 @@ CXXFLAGS := -std=c++11 -g
 
 
 SRC := ${LOCAL_PATH}/src
+SRC_LIBFACE := ${LOCAL_PATH}/src/libFace
+SRC_CAMERA := ${LOCAL_PATH}/src/camera
 EXAM := ${LOCAL_PATH}/example
 
 #VPATH = ./src:
@@ -41,7 +42,8 @@ target := $(target).bin
 
 
 
-srcs := $(shell ls $(SRC)/*.cpp)
+srcs := $(shell ls $(SRC)/*.cpp $(SRC_LIBFACE)/*.cpp \
+	$(SRC_CAMERA)/*.cpp)
 objs := $(srcs:.cpp=.o)
 #deps := $(srcs:.cpp=.d)
 
@@ -67,7 +69,7 @@ $(target): $(objs)
 	$(CC) -o $@ $^ $(LOCAL_SHARE_LIB) $(LOCAL_C_LIBRARIES) -Wl,--rpath=$(LOCAL_PATH)/camera/HCNet/lib:$(LOCAL_PATH)/camera/HCNet/HCNetSDKCom -Wl,--rpath=$(LOCAL_PATH)/caffe/lib 
 
 clean:
-	$(RM) $(SRC)/*.o
+	$(RM) $(SRC)/*.o $(SRC_LIBFACE)/*.o  $(SRC_CAMERA)/*.o 
 	$(RM) *.bin
 
 #install:

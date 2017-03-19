@@ -1,48 +1,8 @@
-#ifndef CLASSIFIER_HPP
-#define CLASSIFIER_HPP
+#include "libFace/Classifier.h"
 
-#include <caffe/caffe.hpp>
 
-#include <opencv/cv.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+namespace libface {
 
-#include <dlib/image_processing/frontal_face_detector.h>
-#include <dlib/image_processing/render_face_detections.h>
-#include <dlib/image_processing.h>
-#include <dlib/gui_widgets.h>
-#include <dlib/image_io.h>
-#include <dlib/opencv/to_open_cv.h>
-
-#include <memory>
-#include <string>
-
-using namespace caffe;
-
-class Classifier {
-public:
-    Classifier(const std::string& model_file, const std::string& trained_file, const std::string& mean_file, int cpu_only);
-    Classifier(const std::string& model_file, const std::string& trained_file, int cpu_only);
-    ~Classifier();
-    std::vector<float> GetFeature(const cv::Mat& img);
-    std::vector<float> GetFeature(const std::string& image_name);
-    void SetMean(const std::string& mean_file);
-    dlib::frontal_face_detector detector;
-    dlib::shape_predictor sp;
-private:
-
-    void WrapInputLayer(std::vector<cv::Mat>* input_channels);
-    void Preprocess(const cv::Mat& img, std::vector<cv::Mat>* input_channels);
-
-private:
-    std::shared_ptr<Net<float> > _net;
-    cv::Size _input_geometry;
-    int _num_channels;
-    cv::Mat _mean;
-    bool _flag_sub_mean = false;
-    int scale_ = 1;
-};
 
 Classifier::~Classifier() {
 
@@ -145,7 +105,7 @@ std::vector<float> Classifier::GetFeature(const cv::Mat& img) {
     return std::vector<float>(begin, end);
 }
 
-std::vector<float> Classifier::GetFeature(const string& image_name) {
+std::vector<float> Classifier::GetFeature(const std::string& image_name) {
     double time1;
     cv::Mat img = cv::imread(image_name, -1);
     Blob<float>* input_layer = _net->input_blobs()[0];
@@ -214,4 +174,5 @@ void Classifier::Preprocess(const cv::Mat& img, std::vector<cv::Mat>* input_chan
         << "Input channels are not wrapping the input layer of the network.";
 }
 
-#endif // CLASSIFIER_HPP
+
+}	// namespace libface

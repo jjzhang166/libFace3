@@ -1,5 +1,6 @@
-#include "FaceOperator.hpp"
-#include "CameraOperator.hpp"
+#include "libFace/FaceOperator.h"
+#include "libFace/Log.h"
+#include "camera/CameraOperator.h"
 
 //#include <opencv2/core.hpp>
 #include <opencv2/core/core.hpp>
@@ -13,6 +14,8 @@ const int STRING_FILENAME_LENGTH = 128;
 static int indexFile = 0;
 
 void DetectResultHandle(cv::Mat res) {
+    using libface::FaceOperator;
+
     char fileName[STRING_FILENAME_LENGTH]{0};
     snprintf(fileName, STRING_FILENAME_LENGTH, "./image/test%d.jpg", indexFile);
     indexFile++;
@@ -57,19 +60,22 @@ void DetectResultHandle(cv::Mat res) {
 }
 
 int main(int argc, char *argv[]) {
+    using namespace libface::camera;
+    using libface::FaceOperator;
+
     bool loadResult = FaceOperator::LoadCascadeClassifier("./resource/haarcascade_frontalface_alt.xml");
     if(false == loadResult) {
         std::cerr << "load cascadfliePathe classier failed\n";
         exit(EXIT_FAILURE);
     }
 
-    CameraOperator::Handler handle = [](cv::Mat mat) {
+    Handler handle = [](cv::Mat mat) {
         cv::imshow("use camera", mat);
         cv::waitKey(1);
         std::thread task(&FaceOperator::FaceDetect, mat, 1.0, true, DetectResultHandle);
         task.detach();
     };
 
-    CameraOperator::HandleFrameFromUSBCamera(handle);
+    HandleFrameFromUSBCamera(handle);
     return 0;
 }

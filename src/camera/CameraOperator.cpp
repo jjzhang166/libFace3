@@ -1,5 +1,4 @@
-#ifndef CameraOperator_H
-#define CameraOperator_H
+#include "camera/CameraOperator.h"
 
 #include <opencv2/opencv.hpp>
 
@@ -11,20 +10,11 @@
 #include <sys/unistd.h>
 
 
-class CameraOperator {
-public:
-    /* type define */
-    typedef std::function<void(cv::Mat)> Handler;
+namespace libface {
 
-    /* prototype */
-    static void HandleFrameFromRtspCamera(std::string rtspAddress, Handler handler);
-    static void HandleFrameFromUSBCamera(Handler handle);
-    static void HandleFrameFromImage(std::string imagePath, Handler handle);
-};
+namespace camera {
 
-/* below is static function define */
-
-void CameraOperator::HandleFrameFromRtspCamera(std::string rtspAddress, Handler handler) {
+void HandleFrameFromRtspCamera(const std::string& rtspAddress, Handler handler) {
 //    string rtspAddress = "rtsp://admin:qy38888813@192.168.1.64:554/che/main/av_stream";
     using namespace cv;
     using namespace std;
@@ -49,9 +39,10 @@ void CameraOperator::HandleFrameFromRtspCamera(std::string rtspAddress, Handler 
             handler(faceImage);
         }
     }
+
 }
 
-void CameraOperator::HandleFrameFromUSBCamera(Handler handler) {
+void HandleFrameFromUSBCamera(Handler handler) {
     using namespace cv;
     using namespace std;
 
@@ -74,9 +65,10 @@ void CameraOperator::HandleFrameFromUSBCamera(Handler handler) {
             handler(faceImage);
         }
     }
+
 }
 
-void CameraOperator::HandleFrameFromImage(std::string imagePath, Handler handler) {
+void HandleFrameFromImage(const std::string& imagePath, Handler handler) {
     using namespace cv;
     using namespace std;
     Mat image = imread(imagePath);
@@ -88,7 +80,12 @@ void CameraOperator::HandleFrameFromImage(std::string imagePath, Handler handler
         handler(image);
     }
 //    waitKey(5000);
+
 }
 
+}	// namespace camera
 
-#endif // CameraOperator_H
+}	// namespace libface
+
+
+
