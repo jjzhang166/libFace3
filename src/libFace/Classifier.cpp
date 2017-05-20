@@ -1,5 +1,7 @@
 #include "libFace/Classifier.h"
 
+using namespace caffe;
+
 
 namespace libface {
 

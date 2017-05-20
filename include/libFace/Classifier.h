@@ -18,7 +18,6 @@
 #include <memory>
 #include <string>
 
-using namespace caffe;
 
 namespace libface {
 
@@ -29,6 +28,7 @@ public:
     Classifier(const std::string& model_file, const std::string& trained_file,
                int cpu_only);
     ~Classifier();
+
     std::vector<float> GetFeature(const cv::Mat& img);
     std::vector<float> GetFeature(const std::string& image_name);
     void SetMean(const std::string& mean_file);
@@ -40,7 +40,7 @@ private:
     void Preprocess(const cv::Mat& img, std::vector<cv::Mat>* input_channels);
 
 private:
-    std::shared_ptr<Net<float>>				_net;
+    std::shared_ptr<caffe::Net<float>>		_net;
     cv::Size								_input_geometry;
     int										_num_channels;
     cv::Mat									_mean;
